@@ -16,7 +16,7 @@ RUDP.prototype.listen = function (port, callback) {
 	  var source = rinfo.address;
 	  var port = rinfo.port;
 	  var ack = JSON.stringify({
-	  	seqno : seqNo.seqno,
+	  	seqno : seqNo.seqno
 	  });
 	  var response = new Buffer(ack);
 	  server.send(response, 0, response.length, port, source, function () {
