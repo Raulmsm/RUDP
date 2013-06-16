@@ -12,18 +12,12 @@ RUDP.prototype.listen = function (port, callback) {
 	var server = net.createSocket("udp4");
 
 	server.on("message", function (msg, rinfo) {
-	  var seqNo = JSON.parse(msg.toString());
-	  var source = rinfo.address;
-	  var port = rinfo.port;
-	  var ack = JSON.stringify({
-	  	seqno : seqNo.seqno
-	  });
-	  var response = new Buffer(ack);
-	  server.send(response, 0, response.length, port, source, function () {
-	  });
-	});
+	  var seqNo = msg.readUInt32BE(0, true);
+	  var msg = msg.toString("utf-8", 4);
+	  this.messageControl.sendACK(server, rinfo.address, rinfo.port, seqNo, callback);
+	}.bind(this));
 
-	server.on("listening", callback);
+	// server.on("listening");
 
 	server.bind(port);
 
@@ -31,4 +25,12 @@ RUDP.prototype.listen = function (port, callback) {
 
 RUDP.prototype.send = function (address, port, message, callback) {
 	this.messageControl.send(message, address, port, callback);
+}
+
+
+function sendMessage() {
+	var sender = new RUDP();
+	sender.send("127.0.0.1", 8080, "test", function() {		
+		sendMessage();
+	});
 }
