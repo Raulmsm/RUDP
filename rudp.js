@@ -26,11 +26,3 @@ RUDP.prototype.listen = function (port, callback) {
 RUDP.prototype.send = function (address, port, message, callback) {
 	this.messageControl.send(message, address, port, callback);
 }
-
-
-function sendMessage() {
-	var sender = new RUDP();
-	sender.send("127.0.0.1", 8080, "test", function() {		
-		sendMessage();
-	});
-}
