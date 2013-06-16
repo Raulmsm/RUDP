@@ -4,7 +4,7 @@ var udp = require('dgram');
 (function(globalenv) {
 	var ACK_PORT = 16407;
 	var ACKED = 0; 
-	var RESEND_TIME_WINDOW = 50;
+	var RESEND_TIME_WINDOW = 5000;
 
 	var seqManager = new SeqNo();
 	var highestAckedPosition = 0;
@@ -26,7 +26,7 @@ var udp = require('dgram');
 	}
 
 	function ackReceived(seqNo) {
-		var msgCallback = messagesPendingAck[seqNo].callback;
+		var msgCallback = messagesPendingAck[seqNo];
 		messagesPendingAck[seqNo] = ACKED;
 
 		if (seqNo === highestAckedPosition + 1) {
@@ -36,38 +36,35 @@ var udp = require('dgram');
 		msgCallback();
 	}
 
+	function waitForACK(socket) {
+		socket.addListener("message", function (msg, rinfo) {
+		    ackReceived(JSON.parse(msg.toString()).seqno);
+		});
+	}
+
 	function isMessageWaitingAck(seqNo) {
 		return messagesPendingAck[seqNo] !== ACKED; 
 	}
 
 	function ensureDelivery(seqNo, bufferedMessage, address, port, socket) {
 		if (isMessageWaitingAck(seqNo)) {
-			socket = socket || udp.createSocket("udp4");
+			if (!socket) {
+				socket = udp.createSocket("udp4");
+				waitForACK(socket);
+			}
+
 			socket.send(bufferedMessage, 0, bufferedMessage.length, port, address, function () {
 				setTimeout(function() {
-					ensureDelivery(seqNo, bufferedMessage, address, port);
+					ensureDelivery(seqNo, bufferedMessage, address, port, socket);
 				}, RESEND_TIME_WINDOW);
 			});
 		}
 	}
 
-	MessageControl.prototype.start = function(callback) {
-		var ackListener = dgram.createSocket("udp4");
-
-		ackListener.on("message", function (msg, rinfo) {
-		  var message = JSON.parse(msg.toString());
-		  ackReceived(message.seqno);
-		});
-
-		ackListener.on("listening", callback);
-
-		ackListener.bind(ACK_PORT);
-	}
-
 	MessageControl.prototype.send = function(message, address, port, callback) {
 		var rudpMessage = addRUDPheaders(message);
 		var bufferedMessage = new Buffer(rudpMessage);
-		var seqNo = seqManager.currentSeqNo;
+		var seqNo = seqManager.getLastSeqNo();
 
 		messagesPendingAck[seqNo] = callback || noop;
 
