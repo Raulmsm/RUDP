@@ -25,7 +25,8 @@ var udp = require('dgram');
 		});
 	}
 
-	function ackReceived(seqNo) {
+	function ackReceived(socket, seqNo) {
+		socket.close();
 		var msgCallback = messagesPendingAck[seqNo];
 		messagesPendingAck[seqNo] = ACKED;
 
@@ -38,7 +39,7 @@ var udp = require('dgram');
 
 	function waitForACK(socket) {
 		socket.addListener("message", function (msg, rinfo) {
-		    ackReceived(JSON.parse(msg.toString()).seqno);
+		    ackReceived(socket, JSON.parse(msg.toString()).seqno);
 		});
 	}
 
