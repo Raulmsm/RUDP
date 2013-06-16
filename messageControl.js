@@ -4,7 +4,7 @@ var udp = require('dgram');
 (function(globalenv) {
 	var ACK_PORT = 16407;
 	var ACKED = 0; 
-	var RESEND_TIME_WINDOW = 5000;
+	var RESEND_TIME_WINDOW = 50;
 
 	var seqManager = new SeqNo();
 	var highestAckedPosition = 0;
