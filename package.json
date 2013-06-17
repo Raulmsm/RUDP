@@ -4,5 +4,6 @@
   "author": "Raul da Silva Martins <raulms.martins@gmail.com>",
   "dependencies": {
   },
-  "engine": "node 0.10.10"
+  "engine": "node 0.10.10",
+  "main": "./lib/RUDP.js"
 }
