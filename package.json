@@ -1,0 +1,8 @@
+{
+  "name": "RUDP",
+  "description": "RUDP is a javascript implementation of reliable UDP for node.js.",
+  "author": "Raul da Silva Martins <raulms.martins@gmail.com>",
+  "dependencies": {
+  },
+  "engine": "node 0.10.10"
+}
