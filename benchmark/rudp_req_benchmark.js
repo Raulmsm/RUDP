@@ -17,7 +17,7 @@ function StartRUDPBenchmarkServer() {
 }
 
 function SendNonStop() {
-	var req = rudp.send('127.0.01', BENCHMARK_PORT, 'test'); 
+	var req = rudp.send('127.0.0.1', BENCHMARK_PORT, 'test'); 
 
 	setImmediate(SendNonStop);
 }
