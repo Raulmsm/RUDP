@@ -21,7 +21,7 @@ function StartHTTPBenchmarkServer() {
 
 function SendNonStop() {
 	var options = {
-		host: 'localhost',
+		host: '127.0.0.1',
 		path: '/',
 		method: 'POST',
 		port: BENCHMARK_PORT
