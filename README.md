@@ -9,5 +9,40 @@ Ideally it will progress towards the classical features described in http://en.w
 
 Depending on the usefulness/interest this gets I will consider implementing this as proper protocol in C and exposing to node via bindings.
 
+## Usage Example
+
+```javascript
+var rudp = require("../lib/rudp");
+
+var SAMPLE_PORT = 8080;
+
+var totalRequestsReceived = 0;
+
+function StartRUDPBenchmarkServer() {
+	var rudpServer = rudp.createServer(function(msg)  {
+		totalRequestsReceived++;
+	}); 
+
+	rudpServer.listen(SAMPLE_PORT);
+}
+
+function SendNonStop() {
+	var req = rudp.send('127.0.0.1', SAMPLE_PORT, 'test'); 
+
+	setImmediate(SendNonStop);
+}
+
+function main() {
+	StartRUDPBenchmarkServer();
+	setInterval(function () {
+		console.log(totalRequestsReceived);
+		totalRequestsReceived = 0;
+	}, 1000); 
+
+	SendNonStop();
+}
+
+main();
+```
 
 
